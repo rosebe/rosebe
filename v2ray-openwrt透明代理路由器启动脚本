@@ -1,0 +1,290 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+STOP=15
+
+NAME=v2rayclinet
+DESC="proxy service v2ray"
+
+ROUTER_SELF_PROXY_OPEN=0					# 0:关    1：开
+UDP_PROXY_OPEN=0                 			# 0:关    1：开
+LOCAL_DNS_SERVER_IP=114.114.114.114
+TCP_PROXY_PORT=1234
+UDP_PROXY_PORT=1234
+
+CHINA_IP_ADDRESS_FILE=/etc/ignore.list		#	China_ip
+
+V2RAY_PATH="/root/v2ray/"			# v2ray 的所有文件放到 /root/v2ray 下面
+V2RAY=${V2RAY_PATH}v2ray            
+V2RAY_CONFIG="config.json"
+REMOTE_V2RAY_SERVER_IP=0
+
+San_ip=1xx.1xx.xxx.xxx
+jp_ip=2xx.xxx.xxx.2xx
+los_ip=1xx.xxx.xx1.xx1
+hk_ip=xxx.xxx.xxx.xxx
+
+San_config="San.json"
+jp_config="JP.json"
+los_config="los.json"
+hk_config="hk.json"
+
+REMOTE_V2RAY_SERVER_San=0			# 0:不使用    1：使用     远程服务器使用开关
+REMOTE_V2RAY_SERVER_jp=1
+REMOTE_V2RAY_SERVER_los=0
+REMOTE_V2RAY_SERVER_hk=0
+
+ if [ "$REMOTE_V2RAY_SERVER_San" -eq 1 ];then
+	REMOTE_V2RAY_SERVER_IP=$San_ip                         #远程v2ray服务器地址
+	V2RAY_CONFIG=${V2RAY_PATH}${San_config}
+	    elif   [ "$REMOTE_V2RAY_SERVER_jp" -eq 1 ] ;then
+		REMOTE_V2RAY_SERVER_IP=$jp_ip
+		V2RAY_CONFIG=${V2RAY_PATH}${jp_config}
+			elif   [ "$REMOTE_V2RAY_SERVER_los" -eq 1 ] ;then
+				REMOTE_V2RAY_SERVER_IP=$los_ip
+				V2RAY_CONFIG=${V2RAY_PATH}${los_config}
+					elif   [ "$REMOTE_V2RAY_SERVER_hk" -eq 1 ] ;then
+						REMOTE_V2RAY_SERVER_IP=$hk_ip
+						V2RAY_CONFIG=${V2RAY_PATH}${hk_config}
+fi
+
+#echo  "REMOTE_V2RAY_SERVER_IP"=$REMOTE_V2RAY_SERVER_IP
+
+
+#恢复IP防火墙规则
+iptables_default() {
+    
+    /etc/init.d/firewall restart >/dev/null 2>&1
+}
+
+
+#配置中国 ip 段ipset list china_routes
+ipset_china_ip_address_list(){
+	
+	ipset -N china_routes hash:net maxelem 9999      	#	中国IP段大约为8900行
+    # 将中国 ip 段全部添加至集合中
+     while read ip;do
+		ipset add china_routes "$ip"
+	 done  < "$CHINA_IP_ADDRESS_FILE"
+
+}
+
+#配置IP防火墙规则
+start_tcp_rules_Iptables() {
+  
+  ipset_china_ip_address_list
+  
+  #tcp iptables rules
+  #建立新链（chains)
+  iptables -t nat -N V2RAY_TCP
+  iptables -t nat -N V2RAY_TCP_FILTER
+ 
+  #在链中添加规则（rules)
+  iptables -t nat -A V2RAY_TCP_FILTER -d $REMOTE_V2RAY_SERVER_IP -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 0.0.0.0/8 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 10.0.0.0/8 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 100.64.0.0/10 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 127.0.0.0/8 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 169.254.0.0/16 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 172.16.0.0/12 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 192.0.0.0/24 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 192.0.2.0/24 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 192.168.0.0/16 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 198.18.0.0/15 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 198.51.100.0/24 -j RETURN
+  iptables -t nat -A V2RAY_TCP_FILTER -d 203.0.113.0/24 -j RETURN
+  #ip6tables -t nat -A V2RAY_TCP_FILTER -d ::1/128 -j RETURN
+  #ip6tables -t nat -A V2RAY_TCP_FILTER -d fc00::/7 -j RETURN
+  #ip6tables -t nat -A V2RAY_TCP_FILTER -d fe80::/10 -j RETURN  
+
+  iptables -t nat -A V2RAY_TCP_FILTER -m set --match-set china_routes dst -j RETURN
+
+  iptables -t nat -A V2RAY_TCP_FILTER -j V2RAY_TCP
+ 
+  iptables -t nat -A V2RAY_TCP -p tcp -j REDIRECT --to-ports $TCP_PROXY_PORT
+  
+  #将新链  V2RAY_TCP_FILTER  接入系统主链 PREROUTING ;( PREROUTING >> V2RAY_TCP_FILTER >> V2RAY_TCP ) ,appent rules 应用规则  
+  iptables -t nat -A PREROUTING -p tcp -j V2RAY_TCP_FILTER  
+  
+  
+  
+  #代理路由器自身流量
+  
+  if [ $ROUTER_SELF_PROXY_OPEN -ne 0 ];then
+   
+  
+  #将新链  V2RAY_TCP_FILTER  接入系统主链 OUTPUT ;( OUTPUT >> V2RAY_TCP_FILTER >> V2RAY_TCP ) ,appent rules 应用规则  
+  
+  iptables -t nat -A OUTPUT -p tcp -j V2RAY_TCP_FILTER
+  
+  fi
+  
+  
+    
+ }
+ 
+ 
+ 
+ 
+  
+start_udp_rules_Iptables() {
+  
+    #udp iptables rules
+	
+  	ip rule add fwmark 0x01/0x01 table 100
+	ip route add local 0.0.0.0/0 dev lo table 100
+	iptables -t mangle -N V2RAY_UDP_MASK
+	iptables -t mangle -N V2RAY_UDP_FILTER
+		
+	#iptables -t mangle -A V2RAY_UDP_FILTER -p udp --dport 53 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d $REMOTE_V2RAY_SERVER_IP -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 0.0.0.0/8 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 10.0.0.0/8 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 100.64.0.0/10 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 127.0.0.0/8 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 169.254.0.0/16 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 172.16.0.0/12 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 192.0.0.0/24 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 192.0.2.0/24 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 192.168.0.0/16 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 198.18.0.0/15 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 198.51.100.0/24 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -d 203.0.113.0/24 -j RETURN
+	#iptables -t mangle -A V2RAY_UDP_FILTER -d ::1/128 -j RETURN
+	#iptables -t mangle -A V2RAY_UDP_FILTER -d fc00::/7 -j RETURN
+	#iptables -t mangle -A V2RAY_UDP_FILTER -d fe80::/10 -j RETURN  
+	iptables -t mangle -A V2RAY_UDP_FILTER -j V2RAY_UDP_MASK
+	
+	iptables -t mangle -A V2RAY_UDP_MASK -p udp -j TPROXY --on-port $UDP_PROXY_PORT --tproxy-mark 0x01/0x01
+    
+	iptables -t mangle -A PREROUTING -p udp -j V2RAY_UDP_FILTER
+	
+	
+	#iptables -t mangle -A OUTPUT -p udp -j V2RAY_UDP_FILTER
+	
+	
+	###iptables -t mangle -N V2RAY_UDP_ROUTER
+	###iptables -t mangle -A V2RAY_UDP_ROUTER -p udp --dport 53 -j MARK --set-mark 1
+	###iptables -t mangle -A V2RAY_UDP_ROUTER -p udp -j MARK --set-mark 1
+	###iptables -t mangle -A OUTPUT -p udp -j V2RAY_UDP_ROUTER
+	
+  
+}
+
+stop_rules_Iptables() {
+  #tcp iptables rules
+  
+  #清空、删除规则新链（chains)
+  iptables -t nat -D PREROUTING -p tcp -j V2RAY_TCP_FILTER
+  
+	#删除代理路由器自身流量规则
+ 
+	if [ $ROUTER_SELF_PROXY_OPEN -ne 0 ];then
+    
+	#清空、删除规则新链（chains)
+	iptables -t nat -D OUTPUT -p tcp -j V2RAY_TCP_FILTER
+  		
+	fi
+     
+  iptables -t nat -F V2RAY_TCP_FILTER
+  iptables -t nat -F V2RAY_TCP
+   
+  iptables -t nat -X V2RAY_TCP_FILTER   
+  iptables -t nat -X V2RAY_TCP
+     
+  ipset destroy china_routes
+  
+  #udp iptables rules
+  
+	if [ $UDP_PROXY_OPEN -ne 0 ];then
+		
+		ip rule del fwmark 0x01/0x01 table 100		#ip rule list
+		ip route del local 0.0.0.0/0 dev lo table 100		#ip route list  (show  all)
+		
+	
+		iptables -t mangle -D PREROUTING -p udp -j V2RAY_UDP_FILTER
+		#iptables -t mangle -D OUTPUT -p udp -j V2RAY_UDP_FILTER
+		
+		iptables -t mangle -F V2RAY_UDP_FILTER 
+		iptables -t mangle -F V2RAY_UDP_MASK  
+
+		iptables -t mangle -X V2RAY_UDP_FILTER 
+		iptables -t mangle -X V2RAY_UDP_MASK  
+				
+	fi
+
+  
+ }
+ 
+ 
+is_v2ray_alive() {
+    v2ray_count=`ps -w |grep '$V2RAY' | grep -v grep | grep -v watchdog | wc -l`
+    if [ "$v2ray_count" -eq 1 ];then
+        return 0  # work ok
+    else
+        return 1
+    fi
+}
+
+restart_v2ray() {
+    killall v2ray >/dev/null 2>&1
+    #$V2RAY >/dev/null 2>&1  &
+	echo ""
+	echo "v2ray: "$V2RAY
+	echo "v2ray-config: "${V2RAY_CONFIG}
+	echo  "REMOTE_V2RAY_SERVER_IP: "$REMOTE_V2RAY_SERVER_IP
+	echo ""
+	$V2RAY -config ${V2RAY_CONFIG}  >/dev/null 2>&1 &
+	echo $$ > /tmp/v2ray.pid
+	
+}
+
+stop_v2ray() {
+	# iptables_default #恢复IP防火墙规则
+	stop_rules_Iptables  >/dev/null 2>&1
+	killall v2ray >/dev/null 2>&1
+
+}
+
+
+
+
+
+start() {
+      
+	  is_v2ray_alive #判断 v2ray 是不是还活着
+    
+	if [ "$?" -ne 0 ];then
+		
+		echo "v2ray restart at "$(date)  
+		echo "Please wait a few seconds "
+		start_tcp_rules_Iptables  #配置IP防火墙规则
+		
+			if [ $UDP_PROXY_OPEN -ne 0 ];then
+				start_udp_rules_Iptables
+			
+			fi
+		restart_v2ray # 启动 v2ray
+		sleep 20	
+        echo "v2ray restart at "$(date) >> /tmp/v2ray.log
+		echo "v2ray turn successful on "$(date) 
+		sleep 10	
+		echo "v2ray is runing on pid"$(ps w | grep -v grep | grep -v ps | grep /root/v2ray) 
+
+	fi
+}
+
+stop() {
+       echo -n "Stopping $DESC: $NAME"
+		stop_v2ray
+       echo " ."
+}
+
+restart() {
+       echo "Restarting $DESC: $NAME... "
+       stop
+       sleep 2
+       start
+}
+
+
