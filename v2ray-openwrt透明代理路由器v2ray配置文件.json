@@ -1,0 +1,253 @@
+{
+  "log": {
+    "loglevel" : "none" // "debug" 
+    },
+  "inbound": {
+    "port": 1800,
+    "listen": "0.0.0.0",
+    "protocol": "socks",
+    "settings": {
+      "auth": "noauth",
+      "udp": false,
+      "ip": "127.0.0.1",
+	  "timeout": 0
+	}
+   },
+   "inboundDetour": [
+  	{
+		"port": 25151,
+		"listen": "0.0.0.0",
+		"protocol": "dokodemo-door",
+		"settings": {
+			"address": "1.1.1.1",
+			"port": 53,
+			"network": "tcp,udp",
+			"timeout": 0,
+			"followRedirect": false,
+			"userLevel": 0
+		}
+	},
+	{
+	    "port": 1234,
+		"listen": "0.0.0.0",
+		"protocol": "dokodemo-door",
+		"settings": {
+			"network": "tcp,udp",
+			"followRedirect": true
+		}
+	}
+  ],
+  "outbound": {
+    "protocol": "vmess",
+	"tag": "default",
+    "settings": {
+      "vnext": [
+        {
+          "address": "xxx.xxx.xxx.xxx",
+          "port": xxx,
+		  "users": [
+            {
+              "id": "xxxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx",
+              "alterId": 60,
+			  "security": "auto"
+            }
+          ]       
+        }
+      ]
+    },
+	"streamSettings": {
+		"network": "ws",
+	    "security": "tls",
+		"tlsSettings": { 
+			"serverName": "xxx.xxxxxx.xxx",
+			"allowInsecure": false
+			},
+		"wsSettings":{
+			"path": "/xxxxx",
+			"headers": {
+			"xxxxxx": "xxxxxxxxxxxx"
+			}
+	    }
+	},
+	"mux": {
+		"enabled": true,
+		"concurrency": 8
+	}
+  },
+  "outboundDetour": [
+    {
+      "protocol": "freedom",
+      "settings": {
+	    "domainStrategy": "AsIs",
+        "timeout": 0
+	  },
+      "tag": "direct"
+    },
+	{
+      "protocol": "blackhole",
+      "tag": "block",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "httpblock",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
+    }
+  ],
+   "dns": {
+    "servers": [
+		"9.9.9.9",
+		"8.8.8.8",
+		"8.8.4.4",
+		"localhost"
+     ]
+   },
+  "routing": {
+    "strategy": "rules",
+    "settings": {
+	  "domainStrategy": "IPIfNonMatch",
+      "rules": [
+	      {
+          "type": "field",
+          "domain": [
+		               
+            "google.com",
+            "youtube.com"
+			           
+          ],
+          "outboundTag": "default"
+         },
+		 {
+          "type": "field",
+          "domain": [
+		  
+			"huaban.com"
+          
+		  ],
+          "outboundTag": "direct"
+         },
+	     {
+          "type": "field",
+          "domain": [
+		    "api.map.baidu.com",
+            "ps.map.baidu.com",
+            "sv.map.baidu.com",
+			"offnavi.map.baidu.com",
+			"newvector.map.baidu.com",
+			"ulog.imap.baidu.com",
+			"newloc.map.n.shifen.com",
+            "googleadservices.com",
+            "googletagmanager.com",
+            "api.share.baidu.com",
+            "symcd.com",
+            "acs86.com",
+            "ad.unimhk.com",
+            "adcome.cn",
+            "adinfuse.com",
+            "admaster.com.cn",
+            "m.reachmax.cn",
+            "cm.l.qq.com",
+            "cms.gtags.net",
+            "push.zhanzhang.baidu.com",
+            "nsclick.baidu.com",
+            "ads.genieessp.com",
+            "ads.mobclix.com",
+            "ads.mopub.com",
+            "ads.yahoo.com",
+            "adsage.cn",
+            "adsage.com",
+            "adsmogo",
+            "adsmogo.org",
+            "adview.cn",
+            "adwhirl.com",
+            "adwo.com",
+            "agn.aty.sohu.com",
+            "appads.com",
+            "ark.letv.com",
+            "beacon.qq.com",
+            "cnzz.com",
+            "crashlytics.com",
+            "de.as.pptv.com",
+            "domob.cn",
+            "domob.org",
+            "doubleclick.net",
+            "duomeng.cn",
+            "duomeng.net",
+            "duomeng.org",
+            "files.adform.net",
+            "flurry.co",
+            "googeadsserving.cn",
+            "google-analytics.com",
+            "googletagservices.com",
+            "hm.baidu.com",
+            "scorecardresearch.com",
+            "ib.adnxs.com",
+            "immob.cn",
+            "init.icloud-analysis.com",
+            "inmobi.com",
+            "lives.l.qq.com",
+            "logstat.t.sfht.com",
+            "m.aty.sohu.com",
+            "m.simaba.taobao.com",
+            "mmstat.com",
+            "mob.com",
+            "mobads-logs.baidu.com",
+            "mobads.baidu.com",
+            "monitor.uu.qq.com",
+            "n.mark.letv.com",
+            "pingma.qq.com",
+            "sax.sina.cn",
+            "secure-ds.serving-sys.com",
+            "smartadserver.com",
+            "stat.m.jd.com",
+            "stat.t.sfht.com",
+            "s.360.cn",
+            "tanx.com",
+            "tapjoyads.com",
+            "umeng.co",
+            "umeng.com",
+            "umtrack.com",
+            "union.youdao.com",
+            "uyunad.com",
+            "youmi.net"      //注意：最后一行没有逗号--“ ，”
+											
+          ],
+          "outboundTag": "httpblock"
+        },
+        {
+          "type": "field",
+          "domain": [
+			"geosite:cn"
+		    ],
+          "outboundTag": "direct"
+        },
+        {
+          "type": "field",
+          "ip": [
+            "0.0.0.0/8",
+            "10.0.0.0/8",
+            "100.64.0.0/10",
+            "127.0.0.0/8",
+            "169.254.0.0/16",
+            "172.16.0.0/12",
+            "192.0.0.0/24",
+            "192.0.2.0/24",
+            "192.168.0.0/16",
+            "198.18.0.0/15",
+            "198.51.100.0/24",
+            "203.0.113.0/24",
+            "::1/128",
+            "fc00::/7",
+            "fe80::/10",
+			"geoip:cn"
+          ],
+          "outboundTag": "direct"
+        }
+      ]
+    }
+  }
+}
