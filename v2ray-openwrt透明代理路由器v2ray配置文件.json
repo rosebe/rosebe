@@ -213,7 +213,7 @@
             "umtrack.com",
             "union.youdao.com",
             "uyunad.com",
-            "youmi.net"      //注意：最后一行没有逗号--“ ，”
+            "youmi.net"      
 											
           ],
           "outboundTag": "httpblock"
