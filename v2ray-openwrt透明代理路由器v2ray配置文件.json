@@ -1,6 +1,6 @@
 {
   "log": {
-    "loglevel" : "none" // "debug" 
+    "loglevel" : "none"  
     },
   "inbound": {
     "port": 1800,
@@ -44,19 +44,19 @@
       "vnext": [
         {
           "address": "xxx.xxx.xxx.xxx",
-          "port": xxx,
-		  "users": [
+          "port": 443,
+	  "users": [
             {
               "id": "xxxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx",
               "alterId": 60,
-			  "security": "auto"
+	      "security": "auto"
             }
           ]       
         }
       ]
     },
 	"streamSettings": {
-		"network": "ws",
+	    "network": "ws",
 	    "security": "tls",
 		"tlsSettings": { 
 			"serverName": "xxx.xxxxxx.xxx",
@@ -81,7 +81,7 @@
 	    "domainStrategy": "AsIs",
         "timeout": 0
 	  },
-      "tag": "direct"
+      	"tag": "direct"
     },
 	{
       "protocol": "blackhole",
@@ -133,13 +133,13 @@
 	     {
           "type": "field",
           "domain": [
-		    "api.map.baidu.com",
+	    "api.map.baidu.com",
             "ps.map.baidu.com",
             "sv.map.baidu.com",
-			"offnavi.map.baidu.com",
-			"newvector.map.baidu.com",
-			"ulog.imap.baidu.com",
-			"newloc.map.n.shifen.com",
+	    "offnavi.map.baidu.com",
+	    "newvector.map.baidu.com",
+	    "ulog.imap.baidu.com",
+	    "newloc.map.n.shifen.com",
             "googleadservices.com",
             "googletagmanager.com",
             "api.share.baidu.com",
@@ -220,9 +220,7 @@
         },
         {
           "type": "field",
-          "domain": [
-			"geosite:cn"
-		    ],
+          "domain": ["geosite:cn"],
           "outboundTag": "direct"
         },
         {
@@ -243,7 +241,7 @@
             "::1/128",
             "fc00::/7",
             "fe80::/10",
-			"geoip:cn"
+	    "geoip:cn"
           ],
           "outboundTag": "direct"
         }
