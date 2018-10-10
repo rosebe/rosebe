@@ -98,8 +98,8 @@
     {
       "protocol": "freedom",
       "settings": {
-	    "domainStrategy": "AsIs",
-        "timeout": 0
+	      "domainStrategy": "AsIs",
+	      "timeout": 0
 	  },
       	"tag": "direct"
     },
@@ -153,13 +153,13 @@
 	     {
           "type": "field",
           "domain": [
-			"api.map.baidu.com",
-            "ps.map.baidu.com",
-            "sv.map.baidu.com",
-			"offnavi.map.baidu.com",
-			"newvector.map.baidu.com",
-			"ulog.imap.baidu.com",
-			"newloc.map.n.shifen.com",
+		"api.map.baidu.com",
+		"ps.map.baidu.com",
+		"sv.map.baidu.com",
+		"offnavi.map.baidu.com",
+		"newvector.map.baidu.com",
+		"ulog.imap.baidu.com",
+		"newloc.map.n.shifen.com",
             "googleadservices.com",
             "googletagmanager.com",
             "api.share.baidu.com",
@@ -261,7 +261,7 @@
             "::1/128",
             "fc00::/7",
             "fe80::/10",
-			"geoip:cn"
+	"geoip:cn"
           ],
           "outboundTag": "direct"
         }
