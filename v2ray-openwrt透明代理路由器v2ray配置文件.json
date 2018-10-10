@@ -34,6 +34,26 @@
 		"settings": {
 			"network": "tcp,udp",
 			"followRedirect": true
+			},
+		"streamSettings": {
+			"sockopt": {
+				"tproxy": "redirect"
+			}
+		}
+	},
+	{
+	    "port": 12345,
+		"listen": "0.0.0.0",
+		"protocol": "dokodemo-door",
+		"settings": {
+			"network": "tcp,udp",
+			"timeout": 30,
+			"followRedirect": true
+		},
+		"streamSettings": {
+			"sockopt": {
+				"tproxy": "tproxy"
+			}
 		}
 	}
   ],
@@ -133,13 +153,13 @@
 	     {
           "type": "field",
           "domain": [
-	    "api.map.baidu.com",
+			"api.map.baidu.com",
             "ps.map.baidu.com",
             "sv.map.baidu.com",
-	    "offnavi.map.baidu.com",
-	    "newvector.map.baidu.com",
-	    "ulog.imap.baidu.com",
-	    "newloc.map.n.shifen.com",
+			"offnavi.map.baidu.com",
+			"newvector.map.baidu.com",
+			"ulog.imap.baidu.com",
+			"newloc.map.n.shifen.com",
             "googleadservices.com",
             "googletagmanager.com",
             "api.share.baidu.com",
@@ -241,7 +261,7 @@
             "::1/128",
             "fc00::/7",
             "fe80::/10",
-	    "geoip:cn"
+			"geoip:cn"
           ],
           "outboundTag": "direct"
         }
