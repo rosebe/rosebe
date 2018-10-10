@@ -136,7 +136,7 @@ start_udp_rules_Iptables() {
 	iptables -t mangle -N V2RAY_UDP_MASK
 	iptables -t mangle -N V2RAY_UDP_FILTER
 		
-	#iptables -t mangle -A V2RAY_UDP_FILTER -p udp --dport 53 -j RETURN
+	iptables -t mangle -A V2RAY_UDP_FILTER -p udp --dport 53 -j RETURN
 	iptables -t mangle -A V2RAY_UDP_FILTER -d $REMOTE_V2RAY_SERVER_IP -j RETURN
 	iptables -t mangle -A V2RAY_UDP_FILTER -d 0.0.0.0/8 -j RETURN
 	iptables -t mangle -A V2RAY_UDP_FILTER -d 10.0.0.0/8 -j RETURN
