@@ -1,0 +1,91 @@
+#!/bin/sh /etc/rc.common
+##/etc/init.d/pdnsd
+
+START=65
+NAME=pdnsd
+DESC="proxy DNS server"
+
+PDNSD_LOCAL_IP=0.0.0.0
+PDNSD_LOCAL_DNS_PORT=25252
+
+REMOTE_DNS_PORT=25151
+REMOTE_DNS_SERVER=127.0.0.1
+
+DAEMON=/usr/sbin/pdnsd
+CONFIG_FILE=/etc/pdnsd.conf
+PID_FILE=/var/run/$NAME.pid
+CACHEDIR=/var/pdnsd
+CACHE=$CACHEDIR/pdnsd.cache
+
+USER=nobody
+GROUP=nogroup
+
+start() {
+       echo -n "Starting $DESC: $NAME"
+
+       gen_cache
+	   
+	   start_pdnsd
+
+#      $DAEMON --daemon -c$CONFIG_FILE -p $PID_FILE
+
+       echo " ."
+}
+
+stop() {
+       echo -n "Stopping $DESC: $NAME"
+       kill `cat $PID_FILE` > /dev/null 2>&1
+       rm -rf $PID_FILE
+	   rm -rf /var/pdnsd/
+       echo " ."
+}
+
+restart() {
+       echo "Restarting $DESC: $NAME... "
+       stop
+       sleep 2
+       start
+}
+
+gen_cache()
+{
+       if ! test -f "$CACHE"; then
+               mkdir -p `dirname $CACHE`
+               dd if=/dev/zero of="$CACHE" bs=1 count=4 2> /dev/null
+               chown -R $USER.$GROUP $CACHEDIR
+       fi
+}
+
+
+start_pdnsd() {
+cat > $CONFIG_FILE <<EOF
+global {
+        perm_cache=2048;
+        cache_dir="/var/pdnsd";
+        pid_file = /var/run/pdnsd.pid;
+        run_as="nobody";
+		server_ip = $PDNSD_LOCAL_IP;
+        server_port = $PDNSD_LOCAL_DNS_PORT;
+        status_ctl = on;
+        query_method = tcp_only;
+        min_ttl=1d;
+        max_ttl=1w;
+        timeout=100;
+        neg_domain_pol=on;
+        proc_limit=2;
+        procq_limit=8;
+}
+server {
+        label= "dns";
+        ip = $REMOTE_DNS_SERVER;
+        port = $REMOTE_DNS_PORT;
+        timeout=90;
+        uptest=none;
+        interval=10m;
+        purge_cache=off;
+}
+EOF
+    $DAEMON --daemon -c $CONFIG_FILE -p $PID_FILE
+}
+
+                                       
