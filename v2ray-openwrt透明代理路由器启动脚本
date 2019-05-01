@@ -12,7 +12,8 @@ LOCAL_DNS_SERVER_IP=114.114.114.114
 TCP_PROXY_PORT=1234
 UDP_PROXY_PORT=12345
 
-CHINA_IP_ADDRESS_FILE=/etc/ignore.list		#	China_ip
+CHINA_IP_ADDRESS_FILE=/etc/ignore.list		                 #	China_ip
+CHINA_IPSET_SAVE_ADDRESS_FILE=/root/ipset-save-china-router.list
 
 V2RAY_PATH="/root/v2ray/"			# v2ray 的所有文件放到 /root/v2ray 下面
 V2RAY=${V2RAY_PATH}v2ray            
@@ -69,10 +70,19 @@ ipset_china_ip_address_list(){
 
 }
 
+ipset_restore_china_ip_address_list(){
+	
+	# 将中国 ip 段全部恢复添加至集合中
+	# 一次 io 可以提高加载速度	
+	ipset restore -f "$CHINA_IPSET_SAVE_ADDRESS_FILE"
+ 
+}
+
 #配置IP防火墙规则
 start_tcp_rules_Iptables() {
   
-  ipset_china_ip_address_list
+#  ipset_china_ip_address_list
+   ipset_restore_china_ip_address_list
   
   #tcp iptables rules
   #建立新链（chains)
