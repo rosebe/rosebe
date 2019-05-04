@@ -275,10 +275,10 @@ start() {
 			
 			fi
 		restart_v2ray # 启动 v2ray
-		sleep 20	
+		sleep 1	
         echo "v2ray restart at "$(date) >> /tmp/v2ray.log
 		echo "v2ray turn successful on "$(date) 
-		sleep 10	
+		sleep 1	
 		echo "v2ray is runing on pid"$(ps w | grep -v grep | grep -v ps | grep /root/v2ray) 
 
 	fi
