@@ -3914,6 +3914,20 @@ add china_routes 103.139.22.0/23
 add china_routes 103.139.113.0/24
 add china_routes 103.139.134.0/23
 add china_routes 103.139.136.0/23
+add china_routes 103.139.172.0/23
+add china_routes 103.139.200.0/23
+add china_routes 103.139.204.0/23
+add china_routes 103.139.212.0/23
+add china_routes 103.140.8.0/23
+add china_routes 103.140.14.0/23
+add china_routes 103.140.46.0/23
+add china_routes 103.140.70.0/23
+add china_routes 103.140.126.0/23
+add china_routes 103.140.140.0/23
+add china_routes 103.140.144.0/23
+add china_routes 103.140.152.0/23
+add china_routes 103.140.192.0/23
+add china_routes 103.140.194.0/23
 add china_routes 103.192.0.0/22
 add china_routes 103.192.4.0/22
 add china_routes 103.192.8.0/22
@@ -5136,6 +5150,8 @@ add china_routes 113.208.96.0/20
 add china_routes 113.208.128.0/17
 add china_routes 113.209.0.0/16
 add china_routes 113.212.0.0/19
+add china_routes 113.212.64.0/22
+add china_routes 113.212.88.0/22
 add china_routes 113.212.100.0/22
 add china_routes 113.212.184.0/21
 add china_routes 113.213.0.0/17
@@ -5702,6 +5718,7 @@ add china_routes 123.242.196.0/22
 add china_routes 123.244.0.0/14
 add china_routes 123.249.0.0/16
 add china_routes 123.253.108.0/22
+add china_routes 123.253.240.0/22
 add china_routes 123.254.96.0/22
 add china_routes 123.254.100.0/22
 add china_routes 124.6.64.0/19
@@ -5821,6 +5838,7 @@ add china_routes 128.108.0.0/16
 add china_routes 129.28.0.0/16
 add china_routes 129.204.0.0/16
 add china_routes 129.211.0.0/16
+add china_routes 129.227.0.0/16
 add china_routes 132.232.0.0/16
 add china_routes 134.175.0.0/16
 add china_routes 137.59.59.0/24
