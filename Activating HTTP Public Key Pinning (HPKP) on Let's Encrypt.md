@@ -15,11 +15,15 @@ cat /etc/letsencrypt/live/YourDomain/cert.pem | openssl x509 -pubkey | openssl p
 
 Again replace path with your domain.
 
-Generate the ISRG Root X1, Let’s Encrypt Authority X3 and Let’s Encrypt Authority X4 SPKI-hash using the following command:
+Generate the ISRG Root X1, Let’s Encrypt Authority X3/R3 and Let’s Encrypt Authority X4/R4 SPKI-hash using the following command:
 
 ```
-curl -s https://letsencrypt.org/certs/lets-encrypt-x4-cross-signed.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
-curl -s https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
+https://letsencrypt.org/certificates/
+
+curl -s https://letsencrypt.org/certs/lets-encrypt-r3.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
+curl -s https://letsencrypt.org/certs/lets-encrypt-r4.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
+curl -s https://letsencrypt.org/certs/letsencryptauthorityx4.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
+curl -s https://letsencrypt.org/certs/letsencryptauthorityx3.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
 curl -s https://letsencrypt.org/certs/isrgrootx1.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
 ```
 
