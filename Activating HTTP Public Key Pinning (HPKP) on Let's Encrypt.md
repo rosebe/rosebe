@@ -22,8 +22,8 @@ https://letsencrypt.org/certificates/
 
 curl -s https://letsencrypt.org/certs/lets-encrypt-r3.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
 curl -s https://letsencrypt.org/certs/lets-encrypt-r4.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
-curl -s https://letsencrypt.org/certs/letsencryptauthorityx4.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
 curl -s https://letsencrypt.org/certs/letsencryptauthorityx3.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
+curl -s https://letsencrypt.org/certs/letsencryptauthorityx4.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
 curl -s https://letsencrypt.org/certs/isrgrootx1.pem | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
 ```
 
